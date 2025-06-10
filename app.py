@@ -1,12 +1,16 @@
+from dotenv import load_dotenv
+load_dotenv()
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import torchaudio
 import torch
 import soundfile as sf
-from transformers import Wav2Vec2ForSequenceClassification, Wav2Vec2Processor
+from transformers import Wav2Vec2FeatureExtractor, Wav2Vec2ForSequenceClassification
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+
+
 
 app = Flask(__name__)
 CORS(app)
@@ -29,7 +33,7 @@ def spotify_test():
     return jsonify(result)
 
 # Emotion model 載入
-processor = Wav2Vec2Processor.from_pretrained("xmj2002/hubert-base-ch-speech-emotion-recognition")
+feature_extractor = Wav2Vec2FeatureExtractor.from_pretrained("xmj2002/hubert-base-ch-speech-emotion-recognition")
 model = Wav2Vec2ForSequenceClassification.from_pretrained("xmj2002/hubert-base-ch-speech-emotion-recognition")
 
 emotion_labels = ['anger', 'fear', 'happy', 'neutral', 'sad', 'surprise']
@@ -49,7 +53,7 @@ def upload_audio():
     
     speech_array, sampling_rate = sf.read(temp_path)
     
-    inputs = processor(speech_array, sampling_rate=sampling_rate, return_tensors="pt", padding=True)
+    inputs = feature_extractor(speech_array, sampling_rate=sampling_rate, return_tensors="pt", padding=True)
     with torch.no_grad():
         logits = model(**inputs).logits
     predicted_id = torch.argmax(logits, dim=-1).item()
