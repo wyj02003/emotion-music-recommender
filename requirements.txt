@@ -3,3 +3,6 @@ flask-cors
 spotipy
 python-dotenv
 gunicorn
+transformers
+torchaudio
+soundfile
