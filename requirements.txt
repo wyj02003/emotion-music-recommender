@@ -2,3 +2,4 @@ flask
 flask-cors
 spotipy
 python-dotenv
+gunicorn
